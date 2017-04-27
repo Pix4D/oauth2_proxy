@@ -37,6 +37,8 @@ Valid providers are :
 * [GitHub](#github-auth-provider)
 * [GitLab](#gitlab-auth-provider)
 * [LinkedIn](#linkedin-auth-provider)
+* [MyUSA](#myusa-auth-provider)
+* [BitBucket](#bitbucket-auth-provider)
 
 The provider can be selected using the `provider` configuration value.
 
@@ -154,6 +156,12 @@ OpenID Connect is a spec for OAUTH 2.0 + identity that is implemented by many ma
     -oidc-issuer-url http://127.0.0.1:5556
     -cookie-secure=false
     -email-domain example.com
+
+## BitBucket Auth Provider
+
+The [BitBucket](https://bitbucket.org) provider.
+
+For BitBucket, follow the [registration steps to create an OAuth client](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html#OAuthonBitbucketCloud-Createaconsumer).
 
 ## Email Authentication
 
