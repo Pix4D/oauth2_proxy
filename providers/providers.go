@@ -32,7 +32,7 @@ func New(provider string, p *ProviderData) Provider {
 	case "oidc":
 		return NewOIDCProvider(p)
 	case "bitbucket":
-		return NewBitBucketProvider(p)
+		return NewBitbucketProvider(p)
 	default:
 		return NewGoogleProvider(p)
 	}
