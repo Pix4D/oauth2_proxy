@@ -10,7 +10,7 @@ import (
 	"github.com/bmizerany/assert"
 )
 
-func testBitbucketProvider(hostname, team string) *BitbucketProvider {
+func testBitbucketProvider(hostname, team string, repository string) *BitbucketProvider {
 	p := NewBitbucketProvider(
 		&ProviderData{
 			ProviderName: "",
@@ -22,6 +22,10 @@ func testBitbucketProvider(hostname, team string) *BitbucketProvider {
 
 	if team != "" {
 		p.SetTeam(team)
+	}
+
+	if repository != "" {
+		p.SetRepository(repository)
 	}
 
 	if hostname != "" {
@@ -55,7 +59,7 @@ func testBitbucketBackend(payload string) *httptest.Server {
 }
 
 func TestBitbucketProviderDefaults(t *testing.T) {
-	p := testBitbucketProvider("", "")
+	p := testBitbucketProvider("", "", "")
 	assert.NotEqual(t, nil, p)
 	assert.Equal(t, "Bitbucket", p.Data().ProviderName)
 	assert.Equal(t, "https://bitbucket.org/site/oauth2/authorize",
@@ -64,7 +68,19 @@ func TestBitbucketProviderDefaults(t *testing.T) {
 		p.Data().RedeemURL.String())
 	assert.Equal(t, "https://api.bitbucket.org/2.0/user/emails",
 		p.Data().ValidateURL.String())
-	assert.Equal(t, "account team", p.Data().Scope)
+	assert.Equal(t, "email", p.Data().Scope)
+}
+
+func TestBitbucketProviderScopeAdjustForTeam(t *testing.T) {
+	p := testBitbucketProvider("", "test-team", "")
+	assert.NotEqual(t, nil, p)
+	assert.Equal(t, "email team", p.Data().Scope)
+}
+
+func TestBitbucketProviderScopeAdjustForRepository(t *testing.T) {
+	p := testBitbucketProvider("", "", "rest-repo")
+	assert.NotEqual(t, nil, p)
+	assert.Equal(t, "email repository", p.Data().Scope)
 }
 
 func TestBitbucketProviderOverrides(t *testing.T) {
@@ -99,7 +115,7 @@ func TestBitbucketProviderGetEmailAddress(t *testing.T) {
 	defer b.Close()
 
 	b_url, _ := url.Parse(b.URL)
-	p := testBitbucketProvider(b_url.Host, "")
+	p := testBitbucketProvider(b_url.Host, "", "")
 
 	session := &SessionState{AccessToken: "imaginary_access_token"}
 	email, err := p.GetEmailAddress(session)
@@ -112,7 +128,7 @@ func TestBitbucketProviderGetEmailAddressAndGroup(t *testing.T) {
 	defer b.Close()
 
 	b_url, _ := url.Parse(b.URL)
-	p := testBitbucketProvider(b_url.Host, "bioinformatics")
+	p := testBitbucketProvider(b_url.Host, "bioinformatics", "")
 
 	session := &SessionState{AccessToken: "imaginary_access_token"}
 	email, err := p.GetEmailAddress(session)
@@ -127,7 +143,7 @@ func TestBitbucketProviderGetEmailAddressFailedRequest(t *testing.T) {
 	defer b.Close()
 
 	b_url, _ := url.Parse(b.URL)
-	p := testBitbucketProvider(b_url.Host, "")
+	p := testBitbucketProvider(b_url.Host, "", "")
 
 	// We'll trigger a request failure by using an unexpected access
 	// token. Alternatively, we could allow the parsing of the payload as
@@ -143,7 +159,7 @@ func TestBitbucketProviderGetEmailAddressEmailNotPresentInPayload(t *testing.T) 
 	defer b.Close()
 
 	b_url, _ := url.Parse(b.URL)
-	p := testBitbucketProvider(b_url.Host, "")
+	p := testBitbucketProvider(b_url.Host, "", "")
 
 	session := &SessionState{AccessToken: "imaginary_access_token"}
 	email, err := p.GetEmailAddress(session)

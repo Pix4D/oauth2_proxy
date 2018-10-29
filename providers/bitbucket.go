@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
 	"github.com/bitly/oauth2_proxy/api"
 )
@@ -13,6 +14,7 @@ import (
 type BitbucketProvider struct {
 	*ProviderData
 	Team string
+	Repository string
 }
 
 func NewBitbucketProvider(p *ProviderData) *BitbucketProvider {
@@ -39,13 +41,23 @@ func NewBitbucketProvider(p *ProviderData) *BitbucketProvider {
 		}
 	}
 	if p.Scope == "" {
-		p.Scope = "account team"
+		p.Scope = "email"
 	}
 	return &BitbucketProvider{ProviderData: p}
 }
 
 func (p *BitbucketProvider) SetTeam(team string) {
 	p.Team = team
+	if ! strings.Contains(p.Scope, "team") {
+		p.Scope += " team"
+	}
+}
+
+func (p *BitbucketProvider) SetRepository(repository string) {
+	p.Repository = repository
+	if ! strings.Contains(p.Scope, "repository") {
+		p.Scope += " repository"
+	}
 }
 
 func debug(data []byte, err error) {
@@ -67,6 +79,11 @@ func (p *BitbucketProvider) GetEmailAddress(s *SessionState) (string, error) {
 	var teams struct {
 		Values []struct {
 			Name string `json:"username"`
+		}
+	}
+	var repositories struct {
+		Values []struct {
+			FullName string `json:"full_name"`
 		}
 	}
 	req, err := http.NewRequest("GET",
@@ -109,6 +126,40 @@ func (p *BitbucketProvider) GetEmailAddress(s *SessionState) (string, error) {
 		}
 		if found != true {
 			log.Printf("team membership test failed, access denied")
+			return "", nil
+		}
+	}
+
+	if p.Repository != "" {
+		log.Printf("Filtering against access to repository %s\n", p.Repository)
+		repositoriesURL := &url.URL{}
+		*repositoriesURL = *p.ValidateURL
+		repositoriesURL.Path = "/2.0/repositories/" + strings.Split(p.Repository, "/")[0]
+		req, err = http.NewRequest("GET",
+			repositoriesURL.String() + "?role=contributor" +
+			"&q=full_name=" + url.QueryEscape("\"" + p.Repository + "\"") +
+			"&access_token=" + s.AccessToken,
+			nil)
+		if err != nil {
+			log.Printf("failed building request %s", err)
+			return "", err
+		}
+		err = api.RequestJson(req, &repositories)
+		if err != nil {
+			log.Printf("failed checking repository access %s", err)
+			debug(httputil.DumpRequestOut(req, true))
+			return "", err
+		}
+		var found = false
+		log.Printf("%+v\n", repositories)
+		for _, repository := range repositories.Values {
+			if p.Repository == repository.FullName {
+				found = true
+				break
+			}
+		}
+		if found != true {
+			log.Printf("repository access test failed, access denied")
 			return "", nil
 		}
 	}
