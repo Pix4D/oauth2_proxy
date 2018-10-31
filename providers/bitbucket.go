@@ -8,12 +8,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/bitly/oauth2_proxy/api"
+	"github.com/Pix4D/oauth2_proxy/api"
 )
 
 type BitbucketProvider struct {
 	*ProviderData
-	Team string
+	Team       string
 	Repository string
 }
 
@@ -48,14 +48,14 @@ func NewBitbucketProvider(p *ProviderData) *BitbucketProvider {
 
 func (p *BitbucketProvider) SetTeam(team string) {
 	p.Team = team
-	if ! strings.Contains(p.Scope, "team") {
+	if !strings.Contains(p.Scope, "team") {
 		p.Scope += " team"
 	}
 }
 
 func (p *BitbucketProvider) SetRepository(repository string) {
 	p.Repository = repository
-	if ! strings.Contains(p.Scope, "repository") {
+	if !strings.Contains(p.Scope, "repository") {
 		p.Scope += " repository"
 	}
 }
@@ -136,9 +136,9 @@ func (p *BitbucketProvider) GetEmailAddress(s *SessionState) (string, error) {
 		*repositoriesURL = *p.ValidateURL
 		repositoriesURL.Path = "/2.0/repositories/" + strings.Split(p.Repository, "/")[0]
 		req, err = http.NewRequest("GET",
-			repositoriesURL.String() + "?role=contributor" +
-			"&q=full_name=" + url.QueryEscape("\"" + p.Repository + "\"") +
-			"&access_token=" + s.AccessToken,
+			repositoriesURL.String()+"?role=contributor"+
+				"&q=full_name="+url.QueryEscape("\""+p.Repository+"\"")+
+				"&access_token="+s.AccessToken,
 			nil)
 		if err != nil {
 			log.Printf("failed building request %s", err)
