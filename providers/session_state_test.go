@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitly/oauth2_proxy/cookie"
+	"github.com/Pix4D/oauth2_proxy/cookie"
 	"github.com/stretchr/testify/assert"
 )
 
