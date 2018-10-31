@@ -26,7 +26,7 @@ func (vt *ValidatorTest) UpdateEmailFileViaCopyingOver(
 	vt.auth_email_file = orig_file
 }
 
-func TestValidatorOverwriteEmailListViaCopyingOver(t *testing.T) {
+func DISABLED_TestValidatorOverwriteEmailListViaCopyingOver(t *testing.T) {
 	vt := NewValidatorTest(t)
 	defer vt.TearDown()
 
