@@ -1,9 +1,25 @@
 language: go
 go:
-  - 1.9.x
-  - 1.10.x
+- 1.10.x
 script:
-  - ./test.sh
+- go build
+- ./test.sh
 sudo: false
 notifications:
   email: false
+before_deploy:
+- git status
+- export BIN_NAME="oauth2_proxy_${TRAVIS_OS_NAME}_${TRAVIS_ARCH}"
+- mv oauth2_proxy "$BIN_NAME"
+- sha256sum "$BIN_NAME" > "${BIN_NAME}.sha256"
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: qULwHFUVlAjarr99ZzOjlWNrMNquMdAbNdWBX00i5akuBSWMM+7TZVMifQOsUIpuP36dcZcpvbAsHbfBKTISB4w496RXrHOV5KZkEOGnbqVg5zYlhOwnjsGhgfbhRZ4/hGP+cmak0x8jdVpQYFyunqw8lTKlVWse2jVnq5178ousWcTm58X703lTJSHJHGpJQylvJQmEeN4KZWXlOzt5Wdanfynbw69F1RWiWTtMQlu9KkOS4nX5JOwhz8l+VYWqakxGX8wrLo/WDIisupOZey6a/L9TSy8pwC52ct+M3oyliOpUuztZSmiPjmF6Vl01IHBI9ykSMIu8WsloOJV4V3tJMBr5+VDZunXrq/oljMTrJBu4FfuufmZgJ4SGx4y/NI8s9JjHd5NlJ8kruGAk6BK3k6Pq8bErTb70EYRov8HTsa+MGKyoPZ+JsbuAHW4hTwn9e/UFCFzyFKr+9htR4sAHuubS8cnnNmvEW+3U5NxolU6gui3D+h+Z+dlG9u918XHWcmYVeHrYRjDoZiVxetlyX9Fy8rguL+BWo4K60HOwo5kKZOialI8+MdkCivGC1S+8ZlvATcMAQkCbvGsslxIJjTxRekxMDqPP5CfNL9H8Irpxmg5YleqmMfwa4QZiDaeClH+xLC296Lnhc1dKbs6iIXfE1TOtb1MwxQU45ZA=
+  file:
+  - "${GOPATH-$HOME/go}/src/github.com/Pix4D/oauth2_proxy/${BIN_NAME}"
+  - "${GOPATH-$HOME/go}/src/github.com/Pix4D/oauth2_proxy/${BIN_NAME}.sha256"
+  on:
+    all_branches: true
+    tag: true
