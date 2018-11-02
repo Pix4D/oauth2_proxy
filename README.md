@@ -4,7 +4,7 @@ oauth2_proxy
 A reverse proxy and static file server that provides authentication using Providers (Google, GitHub, and others)
 to validate accounts by email, domain or group.
 
-[![Build Status](https://secure.travis-ci.org/bitly/oauth2_proxy.svg?branch=master)](http://travis-ci.org/bitly/oauth2_proxy)
+[![Build Status](https://secure.travis-ci.org/Pix4D/oauth2_proxy.svg?branch=master)](http://travis-ci.org/Pix4D/oauth2_proxy)
 
 
 ![Sign In Page](https://cloud.githubusercontent.com/assets/45028/4970624/7feb7dd8-6886-11e4-93e0-c9904af44ea8.png)
@@ -15,7 +15,7 @@ to validate accounts by email, domain or group.
 
 ## Installation
 
-1. Download [Prebuilt Binary](https://github.com/bitly/oauth2_proxy/releases) (current release is `v2.2`) or build with `$ go get github.com/bitly/oauth2_proxy` which will put the binary in `$GOROOT/bin`
+1. Download [Prebuilt Binary](https://github.com/Pix4D/oauth2_proxy/releases) (current release is `v2.3`) or build with `$ go get github.com/Pix4D/oauth2_proxy` which will put the binary in `$GOROOT/bin`
 Prebuilt binaries can be validated by extracting the file and verifying it against the `sha256sum.txt` checksum file provided for each release starting with version `v2.3`.
 ```
 sha256sum -c sha256sum.txt 2>&1 | grep OK
@@ -37,6 +37,8 @@ Valid providers are :
 * [GitHub](#github-auth-provider)
 * [GitLab](#gitlab-auth-provider)
 * [LinkedIn](#linkedin-auth-provider)
+* [MyUSA](#myusa-auth-provider)
+* [Bitbucket](#bitbucket-auth-provider)
 
 The provider can be selected using the `provider` configuration value.
 
@@ -154,6 +156,19 @@ OpenID Connect is a spec for OAUTH 2.0 + identity that is implemented by many ma
     -oidc-issuer-url http://127.0.0.1:5556
     -cookie-secure=false
     -email-domain example.com
+
+### Bitbucket Auth Provider
+
+The [Bitbucket](https://bitbucket.org) provider.
+
+For Bitbucket, follow the [registration steps to create an OAuth client](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html#OAuthonBitbucketCloud-Createaconsumer).
+
+The Bitbucket auth provider supports two additional parameters to restrict
+authentication to members of a given Bitbucket team and/or repository.
+Restricting by team is normally accompanied with `--email-domain=*`
+
+    -bitbucket-team="": restrict logins to members of this team
+    -bitbucket-repository="": restrict logins to user with access to this repository
 
 ## Email Authentication
 
