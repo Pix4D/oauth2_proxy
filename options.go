@@ -264,8 +264,12 @@ func parseProviderInfo(o *Options, msgs []string) []string {
 	case *providers.AzureProvider:
 		p.Configure(o.AzureTenant)
 	case *providers.BitbucketProvider:
-		p.SetTeam(o.BitbucketTeam)
-		p.SetRepository(o.BitbucketRepository)
+		if o.BitbucketTeam != "" {
+			p.SetTeam(o.BitbucketTeam)
+		}
+		if o.BitbucketRepository != "" {
+			p.SetRepository(o.BitbucketRepository)
+		}
 	case *providers.GitHubProvider:
 		p.SetOrgTeam(o.GitHubOrg, o.GitHubTeam)
 	case *providers.GoogleProvider:
